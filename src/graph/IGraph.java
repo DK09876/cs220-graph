@@ -5,6 +5,7 @@ import java.util.Map;
 
 public interface IGraph
 {
+	
     /**
      * Return the {@link Node} with the given name.
      * 
