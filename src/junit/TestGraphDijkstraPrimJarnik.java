@@ -81,7 +81,14 @@ graph dijkstra1 {
         IGraph graph = GraphFactories.createUndirectedWeightedGraphFromEdgeList(new FileInputStream("tests/dijkstra1.txt"));
         IGraph g2 = graph.primJarnik();
         
-        // TODO: put some assertions here to make sure that g2 works
+        // since we're using get or createnode to get the node that exists in g2 we have to make sure that g2 is a good graph
+        assertEquals(true,g2.getAllNodes().size()==(graph.getAllNodes().size())); //graphs must have same number of nodes
+        //both graphs should give the same results for the nodes
+        assertEquals(true,g2.containsNode("A")==(graph.containsNode("A")));
+        assertEquals(true,g2.containsNode("1az")==(graph.containsNode("1az")));
+        assertEquals(true,g2.getAllNodes().size()==(graph.getAllNodes().size()));
+        
+        
         INode a = g2.getOrCreateNode("A");
         INode b = g2.getOrCreateNode("B");
         INode c = g2.getOrCreateNode("C");

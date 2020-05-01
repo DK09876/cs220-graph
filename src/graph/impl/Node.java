@@ -67,7 +67,7 @@ public class Node implements INode
      * @param weight
      */
     public void addDirectedEdgeToNode(INode n, int weight) {
-        neighbors.put(n,weight);
+    	neighbors.put(n,weight);
     }
     
     /**

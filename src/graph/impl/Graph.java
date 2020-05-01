@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.PriorityQueue;
 import java.util.Queue;
 import java.util.Set;
 import java.util.Stack;
@@ -130,16 +131,43 @@ public class Graph implements IGraph {
 	 * @return
 	 */
 	public Map<INode, Integer> dijkstra(String startName) {
-		class Path{
-			String destination;
-			int cost;
+		
+		//helper class path to help the priorityqueue
+		class Path implements Comparable<Path>{
+			private String destination;
+			private int cost;
 			Path(String dest,int cost){
 				this.destination=dest;
-				this.cost=cost;
+				this.cost=cost;		
+			}
+			public String getdest() {
+				return this.destination;
+			}
+			public Integer getcost() {
+				//had to return Integer for compareto method
+				return this.cost;
+			}
+			@Override
+			public int compareTo(Path pt) {
+				return this.getcost().compareTo(pt.getcost());
 			}
 		}
 		
-		
+		Map<INode,Integer> result= new HashMap<INode,Integer>();
+		PriorityQueue<Path> todo=new PriorityQueue<>();
+		todo.add(new Path(startName,0));
+		while (result.size()<this.getAllNodes().size()) {
+			Path nextpath= todo.poll();
+			INode node=nodes.get(nextpath.destination);
+			if (result.containsKey(node))
+				continue;
+			int cost= nextpath.getcost();
+			result.put(node,cost);
+			for (INode n : node.getNeighbors()) {
+				todo.add(new Path(n.getName(), cost + node.getWeight(n)));
+			}	
+		}
+		return result;
 	}
 
 	/**
@@ -151,7 +179,41 @@ public class Graph implements IGraph {
 	 * @return
 	 */
 	public IGraph primJarnik() {
-		// TODO Implement this method
-		throw new UnsupportedOperationException();
+		class Edge implements Comparable <Edge>{
+			public final String src;
+			public final String dst;
+			public final int weight;
+			
+			public Edge(String src,String dst,int weight) {
+				this.src=src;
+				this.dst=dst;
+				this.weight=weight;
+			}
+			
+			public int compareTo(Edge ed) {
+				return this.weight-ed.weight;
+			}
+		}
+		IGraph graph=new Graph();
+		INode start=this.getAllNodes().iterator().next();
+		PriorityQueue<Edge> todo= new PriorityQueue<>();
+		
+		for (INode n : start.getNeighbors()) 
+			todo.add(new Edge(start.getName(),n.getName(),n.getWeight(start)));
+			
+			while (graph.getAllNodes().size()!=this.getAllNodes().size()) {
+				Edge e= todo.poll();
+				if (graph.containsNode(e.dst))
+					continue;
+				INode dst=graph.getOrCreateNode(e.dst);
+				INode src=graph.getOrCreateNode(e.src);
+				src.addUndirectedEdgeToNode(dst, e.weight);
+				
+				//adding stuff back to the PQ
+				INode edgestoadd=nodes.get(e.dst);
+				for (INode n: edgestoadd.getNeighbors())
+					todo.add(new Edge(edgestoadd.getName(),n.getName(),n.getWeight(edgestoadd)));
+			}
+		return graph;
 	}
 }
